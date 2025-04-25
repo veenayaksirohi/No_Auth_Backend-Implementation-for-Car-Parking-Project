@@ -51,7 +51,7 @@ Before you begin, ensure you have the following installed:
 Follow these steps to get the project running locally:
 
 ### 1. Clone Repository
-
+# create a floder name (ie. Parking-Project)
 ```bash
 1. git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
 2. cd No_Auth_Backend-Implementation-for-Car-Parking-Project
