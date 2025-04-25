@@ -51,7 +51,6 @@ Before you begin, ensure you have the following installed:
 Follow these steps to get the project running locally:
 
 ### 1. Clone Repository
-# create a floder name (ie. Parking-Project)
 ```bash
 1. git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
 2. cd No_Auth_Backend-Implementation-for-Car-Parking-Project
@@ -95,8 +94,6 @@ port = 5432
 database_name = "parking_db"
 app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{username}:{password}@{host}:{port}/{database_name}"
 ```
-
-Important: For security and flexibility, it's highly recommended to modify this to use environment variables instead of hardcoding credentials. Update the username, password, host, and port variables to match your local PostgreSQL setup if they differ from the defaults.
 
 ## Running the Application
 
@@ -152,17 +149,3 @@ pytest test_app.py
 
 (Note: Test coverage and specific test commands might need adjustment based on the actual test setup in test_app.py.)
 
-## Contributing
-
-Contributions are welcome! If you'd like to contribute, please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch (git checkout -b feature/your-feature-name).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (git push origin feature/your-feature-name).
-6. Open a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
