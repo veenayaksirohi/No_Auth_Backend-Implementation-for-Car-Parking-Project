@@ -19,8 +19,6 @@ This repository contains the backend implementation for a Car Parking System API
 * [API Endpoints](#api-endpoints)
 * [Database Schema](#database-schema)
 * [Testing](#testing)
-* [Contributing](#contributing)
-* [License](#license)
 
 ## Features
 
