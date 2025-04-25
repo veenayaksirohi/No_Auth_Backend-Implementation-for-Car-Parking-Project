@@ -53,8 +53,8 @@ Follow these steps to get the project running locally:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
-cd No_Auth_Backend-Implementation-for-Car-Parking-Project
+1. git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
+2. cd No_Auth_Backend-Implementation-for-Car-Parking-Project
 ```
 
 ### 2. Create Virtual Environment (Recommended)
@@ -80,7 +80,7 @@ pip install -r requirements.txt
 CREATE DATABASE parking_db;
 
 -- Restore database
-psql -U <your_postgres_username> -d parking_db -f parking_backup.sql  # "(parking_backup.sql file location )"
+psql -U <your_postgres_username> -d parking_db -f <parking_backup.sql_file_location>  
 ```
 
 ### 5. Database Configuration
