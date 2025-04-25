@@ -18,7 +18,6 @@ This repository contains the backend implementation for a Car Parking System API
 * [Running the Application](#running-the-application)
 * [API Endpoints](#api-endpoints)
 * [Database Schema](#database-schema)
-* [Testing](#testing)
 
 ## Features
 
@@ -135,15 +134,5 @@ The application uses several SQLAlchemy models mapped to PostgreSQL tables:
 
 Refer to app.py for detailed model definitions and parking_backup.sql for the exact table structure.
 
-## Testing
 
-The repository includes a test_app.py file. To run the tests:
-
-```bash
-# Ensure you have pytest installed
-pip install pytest
-pytest test_app.py
-```
-
-(Note: Test coverage and specific test commands might need adjustment based on the actual test setup in test_app.py.)
 
