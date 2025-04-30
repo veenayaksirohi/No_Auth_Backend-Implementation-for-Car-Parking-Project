@@ -12,14 +12,13 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
     else:
-        username = "postgres"
-        password = urllib.parse.quote_plus("root")
-        host = "localhost"
-        port = 5432
-        database_name = "parking_db"
+        db_user = os.getenv("DB_USER", "postgres")
+        db_pass = urllib.parse.quote_plus(os.getenv("DB_PASS", "root"))
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_port = os.getenv("DB_PORT", "5432")
+        db_name = os.getenv("DB_NAME", "parking_db")
 
-        # Set the SQLAlchemy database URI
-        app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{username}:{password}@{host}:{port}/{database_name}"
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
