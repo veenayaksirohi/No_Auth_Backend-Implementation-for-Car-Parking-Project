@@ -49,8 +49,8 @@ Follow these steps to get the project running locally:
 
 ### 1. Clone Repository
 ```bash
-1. git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
-2. cd No_Auth_Backend-Implementation-for-Car-Parking-Project
+git clone https://github.com/veenayaksirohi/No_Auth_Backend-Implementation-for-Car-Parking-Project.git
+cd No_Auth_Backend-Implementation-for-Car-Parking-Project
 ```
 
 ### 2. Create Virtual Environment (Recommended)
