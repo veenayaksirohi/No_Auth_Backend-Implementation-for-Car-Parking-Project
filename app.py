@@ -1,10 +1,134 @@
+import os
+import urllib.parse
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
-import urllib.parse
+from dotenv import load_dotenv # To load .env file for local runs
+
+# Load environment variables from .env file if it exists (useful for local dev)
+load_dotenv()
 
 db = SQLAlchemy()
+# MODELS
+class ParkingData(db.Model):
+    parking_name = db.Column(db.String(255), primary_key=True)
+    __tablename__ = 'parking_data'
+    city = db.Column(db.String(255), nullable=False)
+    parking_location = db.Column(db.String(255), nullable=False)
+    address_1 = db.Column(db.Text)
+    address_2 = db.Column(db.Text)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    physical_appearance = db.Column(db.String(255))
+    parking_ownership = db.Column(db.String(255))
+    parking_surface = db.Column(db.String(255))
+    has_cctv = db.Column(db.String(255))
+    has_boom_barrier = db.Column(db.String(255))
+    ticket_generated = db.Column(db.String(255))
+    entry_exit_gates = db.Column(db.String(255))
+    weekly_off = db.Column(db.String(255))
+    parking_timing = db.Column(db.String(255))
+    vehicle_types = db.Column(db.String(255))
+    car_capacity = db.Column(db.Integer)
+    two_wheeler_capacity = db.Column(db.Integer)
+    parking_type = db.Column(db.String(255))
+    payment_modes = db.Column(db.String(255))
+    car_parking_charge = db.Column(db.String(255))
+    two_wheeler_parking_charge = db.Column(db.Text)
+    allows_prepaid_passes = db.Column(db.String(255))
+    provides_valet_services = db.Column(db.String(255))
+    value_added_services = db.Column(db.String(255))
+    notes = db.Column(db.String(255))
+    total_slots = db.Column(db.Integer)
+    available_slots = db.Column(db.Integer)
+    parking_id = db.Column(db.Integer)
+
+class Parkinglots(db.Model):
+    __tablename__ = 'parkinglots_Details'
+    id = db.Column(db.Integer, primary_key=True)
+    parking_id = db.Column(db.Integer)
+    parking_name = db.Column(db.String(255))
+    city = db.Column(db.String(100))
+    parking_location = db.Column(db.String(255))
+    address_1 = db.Column(db.Text)
+    address_2 = db.Column(db.Text)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    physical_appearance = db.Column(db.String(100))
+    parking_ownership = db.Column(db.String(100))
+    parking_surface = db.Column(db.String(100))
+    has_cctv = db.Column(db.String(10))
+    has_boom_barrier = db.Column(db.String(10))
+    ticket_generated = db.Column(db.String(10))
+    entry_exit_gates = db.Column(db.String(100))
+    weekly_off = db.Column(db.String(50))
+    parking_timing = db.Column(db.String(100))
+    vehicle_types = db.Column(db.String(100))
+    car_capacity = db.Column(db.Integer)
+    two_wheeler_capacity = db.Column(db.Integer)
+    parking_type = db.Column(db.String(100))
+    payment_modes = db.Column(db.String(100))
+    car_parking_charge = db.Column(db.String(100))
+    two_wheeler_parking_charge = db.Column(db.String(100))
+    allows_prepaid_passes = db.Column(db.String(10))
+    provides_valet_services = db.Column(db.String(10))
+    value_added_services = db.Column(db.Text)
+    notes = db.Column(db.Text)
+    total_slots = db.Column(db.Integer)
+    available_slots = db.Column(db.Integer)
+    address1 = db.Column(db.Float)
+    address2 = db.Column(db.Float)
+    two_wheeler_parking_carge = db.Column(db.Float)
+
+class Floor(db.Model):
+    __tablename__ = 'floors'
+    floor_id = db.Column(db.Integer, primary_key=True)
+    floor_name = db.Column(db.String(50))
+    rows = db.relationship('Row', backref='floor', lazy=True)
+
+class Row(db.Model):
+    __tablename__ = 'rows'
+    row_id = db.Column(db.Integer, primary_key=True)
+    floor_id = db.Column(db.Integer, db.ForeignKey('floors.floor_id'))
+    row_name = db.Column(db.String(50))
+    slots = db.relationship('Slot', backref='row', lazy=True)
+
+class Slot(db.Model):
+    __tablename__ = 'slots'
+    slot_id = db.Column(db.Integer, primary_key=True)
+    row_id = db.Column(db.Integer, db.ForeignKey('rows.row_id'))
+    slot_name = db.Column(db.String(50))
+    status = db.Column(db.Integer, default=1)
+    vehicle_reg_no = db.Column(db.String(20), nullable=True)
+    ticket_id = db.Column(db.String(20), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
+
+class User(db.Model):
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(100), nullable=False)
+    user_phone_no = db.Column(db.BigInteger, nullable=False)
+    user_address = db.Column(db.String(255))
+    user_email = db.Column(db.String(100))
+    user_password = db.Column(db.String(255))
+
+class Reservation(db.Model):
+    __tablename__ = 'reservations'
+    reservation_id = db.Column(db.Integer, primary_key=True)
+    slot_id = db.Column(db.Integer, db.ForeignKey('slots.slot_id'), nullable=False)
+    hour = db.Column(db.Integer, nullable=False)
+    reserved = db.Column(db.Boolean, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+class ParkingSession(db.Model):
+    __tablename__ = 'parkingsessions'
+    ticket_id = db.Column(db.String(20), primary_key=True)
+    slot_id = db.Column(db.Integer, db.ForeignKey('slots.slot_id'))
+    vehicle_reg_no = db.Column(db.String(20))
+    start_time = db.Column(db.DateTime, default=datetime.utcnow)
+    end_time = db.Column(db.DateTime, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -24,130 +148,7 @@ def create_app(test_config=None):
 
     db.init_app(app)
 
-    # MODELS
-    class ParkingData(db.Model):
-        __tablename__ = 'parking_data'
-        parking_name = db.Column(db.String(255), primary_key=True)
-        city = db.Column(db.String(255), nullable=False)
-        parking_location = db.Column(db.String(255), nullable=False)
-        address_1 = db.Column(db.Text)
-        address_2 = db.Column(db.Text)
-        latitude = db.Column(db.Float)
-        longitude = db.Column(db.Float)
-        physical_appearance = db.Column(db.String(255))
-        parking_ownership = db.Column(db.String(255))
-        parking_surface = db.Column(db.String(255))
-        has_cctv = db.Column(db.String(255))
-        has_boom_barrier = db.Column(db.String(255))
-        ticket_generated = db.Column(db.String(255))
-        entry_exit_gates = db.Column(db.String(255))
-        weekly_off = db.Column(db.String(255))
-        parking_timing = db.Column(db.String(255))
-        vehicle_types = db.Column(db.String(255))
-        car_capacity = db.Column(db.Integer)
-        two_wheeler_capacity = db.Column(db.Integer)
-        parking_type = db.Column(db.String(255))
-        payment_modes = db.Column(db.String(255))
-        car_parking_charge = db.Column(db.String(255))
-        two_wheeler_parking_charge = db.Column(db.Text)
-        allows_prepaid_passes = db.Column(db.String(255))
-        provides_valet_services = db.Column(db.String(255))
-        value_added_services = db.Column(db.String(255))
-        notes = db.Column(db.String(255))
-        total_slots = db.Column(db.Integer)
-        available_slots = db.Column(db.Integer)
-        parking_id = db.Column(db.Integer)
     
-    class Parkinglots(db.Model):
-        __tablename__ = 'parkinglots_Details'
-        id = db.Column(db.Integer, primary_key=True)
-        parking_id = db.Column(db.Integer)
-        parking_name = db.Column(db.String(255))
-        city = db.Column(db.String(100))
-        parking_location = db.Column(db.String(255))
-        address_1 = db.Column(db.Text)
-        address_2 = db.Column(db.Text)
-        latitude = db.Column(db.Float)
-        longitude = db.Column(db.Float)
-        physical_appearance = db.Column(db.String(100))
-        parking_ownership = db.Column(db.String(100))
-        parking_surface = db.Column(db.String(100))
-        has_cctv = db.Column(db.String(10))
-        has_boom_barrier = db.Column(db.String(10))
-        ticket_generated = db.Column(db.String(10))
-        entry_exit_gates = db.Column(db.String(100))
-        weekly_off = db.Column(db.String(50))
-        parking_timing = db.Column(db.String(100))
-        vehicle_types = db.Column(db.String(100))
-        car_capacity = db.Column(db.Integer)
-        two_wheeler_capacity = db.Column(db.Integer)
-        parking_type = db.Column(db.String(100))
-        payment_modes = db.Column(db.String(100))
-        car_parking_charge = db.Column(db.String(100))
-        two_wheeler_parking_charge = db.Column(db.String(100))
-        allows_prepaid_passes = db.Column(db.String(10))
-        provides_valet_services = db.Column(db.String(10))
-        value_added_services = db.Column(db.Text)
-        notes = db.Column(db.Text)
-        total_slots = db.Column(db.Integer)
-        available_slots = db.Column(db.Integer)
-        address1 = db.Column(db.Float)
-        address2 = db.Column(db.Float)
-        two_wheeler_parking_carge = db.Column(db.Float)
-
-    
-
-    class Floor(db.Model):
-        __tablename__ = 'floors'
-        floor_id = db.Column(db.Integer, primary_key=True)
-        floor_name = db.Column(db.String(50))
-        rows = db.relationship('Row', backref='floor', lazy=True)
-    
-    
-
-    class Row(db.Model):
-        __tablename__ = 'rows'
-        row_id = db.Column(db.Integer, primary_key=True)
-        floor_id = db.Column(db.Integer, db.ForeignKey('floors.floor_id'))
-        row_name = db.Column(db.String(50))
-        slots = db.relationship('Slot', backref='row', lazy=True)
-
-    class Slot(db.Model):
-        __tablename__ = 'slots'
-        slot_id = db.Column(db.Integer, primary_key=True)
-        row_id = db.Column(db.Integer, db.ForeignKey('rows.row_id'))
-        slot_name = db.Column(db.String(50))
-        status = db.Column(db.Integer, default=1)
-        vehicle_reg_no = db.Column(db.String(20), nullable=True)
-        ticket_id = db.Column(db.String(20), nullable=True)
-        user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
-
-    class User(db.Model):
-        __tablename__ = 'users'
-        user_id = db.Column(db.Integer, primary_key=True)
-        user_name = db.Column(db.String(100), nullable=False)
-        user_phone_no = db.Column(db.BigInteger, nullable=False)
-        user_address = db.Column(db.String(255))
-        user_email = db.Column(db.String(100))
-        user_password = db.Column(db.String(255))
-
-    class Reservation(db.Model):
-        __tablename__ = 'reservations'
-        reservation_id = db.Column(db.Integer, primary_key=True)
-        slot_id = db.Column(db.Integer, db.ForeignKey('slots.slot_id'), nullable=False)
-        hour = db.Column(db.Integer, nullable=False)
-        reserved = db.Column(db.Boolean, nullable=False)
-        user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-
-    class ParkingSession(db.Model):
-        __tablename__ = 'parkingsessions'
-        ticket_id = db.Column(db.String(20), primary_key=True)
-        slot_id = db.Column(db.Integer, db.ForeignKey('slots.slot_id'))
-        vehicle_reg_no = db.Column(db.String(20))
-        start_time = db.Column(db.DateTime, default=datetime.utcnow)
-        end_time = db.Column(db.DateTime, nullable=True)
-        user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-
     # ROUTES
 
 
